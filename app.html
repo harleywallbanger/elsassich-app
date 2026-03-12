@@ -167,6 +167,15 @@ const ANTI_GERM = {
   "scheiußegal":"isch m'r wuuscht","egal":"isch m'r wuuscht",
 };
  
+// Corrections post-traduction (erreurs fréquentes de l'IA)
+const POST_CORRECT = {
+  "gaht's":"geht's","gaht es":"geht's","gaht":"geht",
+  "wie gaht":"wie geht","wie gaht's":"wie geht's",
+  "gaat's":"geht's","gaat":"geht",
+  "güete tag":"güete dag","guten":"güete",
+  "ìch":"ich","Ìch":"Ich",
+};
+ 
 // ════════════════════════════════════════════════════════
 // ONBOARDING
 const ONBOARDING = [
@@ -605,10 +614,10 @@ function AlsacienApp() {
       : "Traduis ce texte ALSACIEN en français courant.";
     try {
       const _schema = '{"direction":"' + dirLabel + '","translation":"...","phonetic":"...","bas_rhin":null,"haut_rhin":null,"notes":"...","literal":null,"register":"..."}';
-      const _prompt = "Tu es un expert linguiste specialise dans le dialecte alsacien. DIRECTION : " + dirForce + " Reponds UNIQUEMENT en JSON valide sans backticks : " + _schema + " Texte : " + cleaned;
+      const _prompt = "Tu es un expert linguiste specialise dans le dialecte alsacien (Elsassisch), graphie ORTHAL stricte. REGLES IMPORTANTES : ecris geht (jamais gaht), ich (jamais ìch), wie geht's (jamais wie gaht's). Utilise exclusivement les formes ORTHAL normalisees. DIRECTION : " + dirForce + " Reponds UNIQUEMENT en JSON valide sans backticks : " + _schema + " Texte : " + cleaned;
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method:"POST",
-        headers:{"Content-Type":"application/json","x-api-key":"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","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+        headers:{"Content-Type":"application/json","x-api-key":"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","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
         body: JSON.stringify({
           model:"claude-sonnet-4-20250514", max_tokens:1000,
           messages:[{ role:"user", content: _prompt }]
@@ -617,6 +626,19 @@ function AlsacienApp() {
       const data = await res.json();
       const txt2 = data.content?.map(b=>b.text||"").join("")||"";
       const parsed = JSON.parse(txt2.replace(/\`\`\`json|\`\`\`/g,"").trim());
+      // Apply post-corrections to translation
+      if (parsed.translation) {
+        let t = parsed.translation;
+        for (const [wrong, right] of Object.entries(POST_CORRECT)) {
+          t = t.replace(new RegExp(wrong, "gi"), right);
+        }
+        parsed.translation = t;
+      }
+      if (parsed.phonetic) {
+        let p = parsed.phonetic;
+        p = p.replace(/ɡaːts/g, "ɡeːts").replace(/gaːts/g, "geːts");
+        parsed.phonetic = p;
+      }
       setResult(parsed);
       addXp(10);
       setHistory(h => [{ input:cleaned, result:parsed, ts:new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) }, ...h].slice(0,20));
