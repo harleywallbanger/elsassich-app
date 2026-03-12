@@ -12,8 +12,10 @@
     body{background:#B8201A;font-family:'Outfit',sans-serif;overscroll-behavior:none}
     ::-webkit-scrollbar{display:none}
     #root{height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
-    #splash{position:fixed;inset:0;background:linear-gradient(160deg,#7A0D08,#B8201A,#D4302A);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .6s .5s}
+    #splash{position:fixed;inset:0;background:linear-gradient(160deg,#7A0D08,#B8201A,#D4302A);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s}
     #splash.hide{opacity:0;pointer-events:none}
+    .sp-start-btn{margin-top:32px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.5);color:#fff;font-family:"Outfit",sans-serif;font-size:16px;font-weight:600;padding:14px 36px;border-radius:50px;cursor:pointer;letter-spacing:.5px;backdrop-filter:blur(4px);transition:background .2s,opacity .4s;opacity:0}
+    .sp-start-btn:hover{background:rgba(255,255,255,0.25)}
     .sp-emoji{font-size:72px;margin-bottom:20px;animation:bounce 1.2s ease-in-out infinite}
     .sp-title{font-family:'Cormorant Garamond',serif;font-size:36px;color:#fff;font-weight:700;margin-bottom:8px}
     .sp-sub{font-size:14px;color:rgba(255,255,255,.75);letter-spacing:1px}
@@ -90,6 +92,8 @@
     <div class="sp-title">Elsassich</div>
     <div class="sp-sub">Le dialecte alsacien vivant</div>
     <div class="sp-dots"><div class="sp-dot"></div><div class="sp-dot"></div><div class="sp-dot"></div></div>
+    <div class="sp-sub" style="margin-top:16px;font-size:13px;opacity:0.7">Apprenez l'alsacien, la langue du cœur de l'Alsace</div>
+    <button class="sp-start-btn" onclick="document.getElementById('splash').classList.add('hide');setTimeout(()=>document.getElementById('splash').remove(),600)">Uf geht's ! →</button>
   </div>
   <div id="root"></div>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -112,9 +116,10 @@ const Storage = {
     this._data[key] = value;
   },
 };
-
-import { useState, useRef, useCallback, useEffect } from "react";
-
+ 
+// React hooks available globally
+const { useState, useRef, useCallback, useEffect } = React;
+ 
 // ════════════════════════════════════════════════════════
 // THÈMES VISUELS
 const THEMES = {
@@ -127,7 +132,7 @@ const THEMES = {
     tabBg:"#FFFFFF", shadow:"rgba(0,0,0,0.10)",
   },
 };
-
+ 
 // ════════════════════════════════════════════════════════
 // CORRECTIONS ANTI-GERMANISME
 const ANTI_GERM = {
@@ -161,7 +166,7 @@ const ANTI_GERM = {
   "mein gott":"yésses gott","verdammt":"verdeckel !",
   "scheiußegal":"isch m'r wuuscht","egal":"isch m'r wuuscht",
 };
-
+ 
 // ════════════════════════════════════════════════════════
 // ONBOARDING
 const ONBOARDING = [
@@ -176,7 +181,7 @@ const ONBOARDING = [
     cta:"Continuer",
   },
 ];
-
+ 
 // ════════════════════════════════════════════════════════
 // NIVEAUX XP
 const LEVELS = [
@@ -188,10 +193,10 @@ const LEVELS = [
   { min:800,  label:"Alsacien d'honneur",  icon:"🥨", desc:"Presque un local !" },
   { min:1200, label:"Vrai Elsässer",       icon:"🦢", desc:"Tu parles comme un vrai !" },
 ];
-
+ 
 const getLevel = (xp) => [...LEVELS].reverse().find(l => xp >= l.min) || LEVELS[0];
 const getNextLevel = (xp) => LEVELS.find(l => l.min > xp) || null;
-
+ 
 // ════════════════════════════════════════════════════════
 // COMMENT DITES-VOUS ?
 const COMMENT_DITES_VOUS = [
@@ -262,7 +267,7 @@ const COMMENT_DITES_VOUS = [
     ]
   },
 ];
-
+ 
 const DICTIONARY = [
   { als:"Bùschùr", fr:"Bonjour", phonetic:"Boo-shur", bas:"Bùschùr", haut:"Bùschùr", cat:"salutations", emoji:"👋" },
   { als:"Güete Morje", fr:"Bonjour (matin)", phonetic:"Gü-eta Mor-ya", bas:"Güete Morje", haut:"Güete Morje", cat:"salutations", emoji:"🌅" },
@@ -326,7 +331,7 @@ const DICTIONARY = [
   { als:"Pfennifuchser", fr:"Radin (lit. qui attrape ses sous)", phonetic:"Pfeni-fuch-ser", bas:"Pfennifuchser", haut:"Pfennifuchser", cat:"humour", emoji:"🪙" },
   { als:"Extrawurcht", fr:"Celui qui fait l'original", phonetic:"Ex-tra-vurst", bas:"Extrawurcht", haut:"Extrawurcht", cat:"humour", emoji:"🌭" },
 ];
-
+ 
 const EXPRESSIONS = [
   { als:"Do legt dr Hàs im Pfeffer", fr:"C'est là que le bât blesse", literal:"C'est là que le lièvre est couché dans le poivre", equiv:"Voilà le vrai problème !", emoji:"🐰" },
   { als:"Hopla Geis, dr Bock hàt Hochzit !", fr:"Dépêche-toi !", literal:"Hop là chèvre, le bouc se marie !", equiv:"Allez, grouille-toi !", emoji:"🐐" },
@@ -341,13 +346,14 @@ const EXPRESSIONS = [
   { als:"Uffem Holtweg sin", fr:"Se tromper complètement", literal:"Être sur le chemin de déboisement", equiv:"Se fourrer le doigt dans l'œil", emoji:"🌲" },
   { als:"Làwà wie na Spàtz ùff à Rossmichthuffe", fr:"Vivre comme un coq en pâte", literal:"Vivre comme un moineau sur un tas de crottin", equiv:"Être aux anges, sans se plaindre", emoji:"🐦" },
 ];
-
-const EXEMPLES = [
+ 
+const EXEMPLES_ALL = [
   "Bonjour, ça va ?","Je veux une bière","Il fait froid","Merci beaucoup",
   "Bonne nuit","Au revoir","Bon appétit !","Je suis fatigué",
-  "Comment tu t'appelles ?","À bientôt !",
+  "Comment tu t'appelles ?","À bientôt !","C'est délicieux !","Il pleut encore",
+  "Je suis perdu","Où est la gare ?","C'est combien ?","Santé !",
 ];
-
+ 
 const QUIZ = [
   { q:"Comment dit-on 'Bonne nuit' ?", a:["Güet Nàcht","Güete Morje","Orùaar","Bis bàll"], c:0 },
   { q:"Que signifie 'Hopla' ?", a:["Bonsoir","Au revoir","Allez / On y va !","Merci"], c:2 },
@@ -362,7 +368,7 @@ const QUIZ = [
   { q:"'Oschterputz' c'est :", a:["Noël en Alsace","Le nettoyage de printemps","Un plat mijoté","Un vent chaud"], c:1 },
   { q:"'Noch eis !' veut dire :", a:["C'est assez","Encore un !","Santé !","À demain"], c:1 },
 ];
-
+ 
 const HUMOR = [
   { q:"Pourquoi les Alsaciens ne jouent pas aux cartes dans la forêt ?", r:"Parce qu'il y a trop de bûche-lards… pardon, bûcherons !", e:"🃏" },
   { q:"Comment appelle-t-on un Alsacien qui perd son sèche-cheveux ?", r:"Un sans-Foehn ! (sans fond)", e:"💨" },
@@ -373,7 +379,7 @@ const HUMOR = [
   { q:"Vous êtes sûrement Alsacien si :", r:"Vous prononcez 'Souffelweyersheim', 'Krautergersheim' et 'Niederschaeffolsheim' sans bégayer.", e:"🏘️" },
   { q:"Pourquoi l'Alsacien dit-il 'Oyééé' ?", r:"C'est la réponse universelle à tout : la surprise, la douleur, la déception et... le bonheur. C'est efficace.", e:"😮" },
 ];
-
+ 
 const LOCAL_ADS = [
   { name:"Brasserie Uberach", city:"Uberach (67)", desc:"Bières artisanales brassées en Alsace du Nord", tag:"🍺 Brasserie locale", colors:["#3A2800","#8B6000"] },
   { name:"Winstub Zum Strissel", city:"Strasbourg", desc:"Cuisine alsacienne authentique, boiseries 1920", tag:"🍷 Winstub traditionnelle", colors:["#6B1414","#A52A2A"] },
@@ -381,9 +387,9 @@ const LOCAL_ADS = [
   { name:"Fromagerie Fischer", city:"Munster (68)", desc:"Vrai Munster fermier AOP, affiné en cave naturelle", tag:"🧀 Producteur local", colors:["#4A2800","#8B5000"] },
   { name:"Marché de Noël · Christkindelsmark", city:"Strasbourg", desc:"Le plus ancien marché de Noël d'Europe — depuis 1570", tag:"🎄 Incontournable", colors:["#0A3D0A","#1A7A1A"] },
 ];
-
+ 
 const CATS = ["tous","salutations","quotidien","cuisine","expressions","vêtements","politesse","état","affection","humour","traditions","géographie","météo"];
-
+ 
 // ════════════════════════════════════════════════════════
 // IDENTITÉ VISUELLE — ROT UN WISS ALSACIEN
 const T = {
@@ -403,9 +409,39 @@ const T = {
   shdDark:     "rgba(170,140,128,0.5)",
   grad:        "linear-gradient(145deg,#7A0D08 0%,#B8201A 52%,#D4302A 100%)",
 };
-
+ 
 // ════════════════════════════════════════════════════════
 // COMPOSANT PRINCIPAL
+function AdBanner() {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx(i => (i+1) % LOCAL_ADS.length), 3500);
+    return () => clearInterval(t);
+  }, []);
+  const ad = LOCAL_ADS[idx];
+  return (
+    <div style={{
+      margin:"8px 12px 0",borderRadius:12,overflow:"hidden",
+      background:"linear-gradient(135deg,"+ad.colors[0]+","+ad.colors[1]+")",
+      padding:"9px 14px",display:"flex",alignItems:"center",gap:10,
+      boxShadow:"0 2px 8px rgba(0,0,0,0.15)",minHeight:52,
+      transition:"background 0.8s ease",cursor:"pointer",
+      position:"relative"
+    }}>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:10,color:"rgba(255,255,255,0.7)",fontWeight:700,letterSpacing:.8,textTransform:"uppercase",marginBottom:2}}>{ad.tag}</div>
+        <div style={{fontSize:13,color:"#fff",fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{ad.name}</div>
+        <div style={{fontSize:11,color:"rgba(255,255,255,0.75)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{ad.city} · {ad.desc}</div>
+      </div>
+      <div style={{display:"flex",gap:4,flexShrink:0}}>
+        {LOCAL_ADS.map((_,i) => (
+          <div key={i} onClick={()=>setIdx(i)} style={{width:6,height:6,borderRadius:"50%",background:i===idx?"#fff":"rgba(255,255,255,0.35)",cursor:"pointer",transition:"background 0.3s"}} />
+        ))}
+      </div>
+    </div>
+  );
+}
+ 
 function AlsacienApp() {
   const [tab, setTab] = useState("translate");
   const [direction, setDirection] = useState("fr2als");
@@ -438,6 +474,7 @@ function AlsacienApp() {
   const pronRateRef = useRef(0.75);
   const [shuffled] = useState(() => [...QUIZ].sort(()=>Math.random()-0.5));
   const [wordOfDay] = useState(() => DICTIONARY[Math.floor(Math.random()*DICTIONARY.length)]);
+  const [exemples, setExemples] = useState(() => [...EXEMPLES_ALL].sort(()=>Math.random()-0.5).slice(0,6));
   const [lessonCat, setLessonCat] = useState(null);
   const [lessonStep, setLessonStep] = useState(0);
   const [lessonCardIdx, setLessonCardIdx] = useState(0);
@@ -454,7 +491,7 @@ function AlsacienApp() {
   const [correctWord, setCorrectWord] = useState("");
   const [correctSugg, setCorrectSugg] = useState("");
   const [correctSent, setCorrectSent] = useState(false);
-
+ 
   // ── GAMIFICATION & ONBOARDING ──
   const today = new Date().toDateString();
   const [showOnboarding, setShowOnboarding] = useState(() => {
@@ -466,7 +503,7 @@ function AlsacienApp() {
   const [showLevelUp, setShowLevelUp] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [todayDone, setTodayDone] = useState(() => { try { return Storage.getItem('els_today') === today; } catch { return false; } });
-
+ 
   const addXp = useCallback((pts) => {
     setXp(prev => {
       const oldLevel = getLevel(prev);
@@ -477,7 +514,7 @@ function AlsacienApp() {
       return newXp;
     });
   }, []);
-
+ 
   useEffect(() => {
     if (todayDone) return;
     const lastDay = (() => { try { return Storage.getItem('els_lastday'); } catch { return null; } })();
@@ -491,29 +528,29 @@ function AlsacienApp() {
       Storage.setItem('els_today', today);
     } catch {}
   }, []);
-
+ 
   useEffect(() => {
     if (showLevelUp) { const t = setTimeout(() => setShowLevelUp(null), 3000); return () => clearTimeout(t); }
   }, [showLevelUp]);
-
+ 
   useEffect(() => {
     const h = (e) => { if (shareRef.current && !shareRef.current.contains(e.target)) setShowShare(false); };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
-
+ 
   const applyAntiGerm = (text) => {
     const lower = text.toLowerCase().trim();
     for (const [germ, als] of Object.entries(ANTI_GERM)) {
       if (lower.includes(germ)) {
-        setCorrectionMsg("✅ Correction : \""+germ+"\" → \""+als+"\"");
+        setCorrectionMsg("✅ Correction : " + germ + " → " + als);
         setTimeout(() => setCorrectionMsg(null), 4000);
         return text.replace(new RegExp(germ, "gi"), als);
       }
     }
     return text;
   };
-
+ 
   const speak = useCallback((text, id) => {
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
@@ -523,9 +560,9 @@ function AlsacienApp() {
     u.onend = () => setSpeaking(null);
     window.speechSynthesis.speak(u);
   }, []);
-
+ 
   const pronWords = DICTIONARY.filter(d => d.cat === pronCat);
-
+ 
   const speakWord = useCallback((text, rate, onDone) => {
     if (!window.speechSynthesis) { onDone?.(); return; }
     window.speechSynthesis.cancel();
@@ -534,7 +571,7 @@ function AlsacienApp() {
     u.onend = () => onDone?.();
     window.speechSynthesis.speak(u);
   }, []);
-
+ 
   const playWordAt = useCallback((idx, words, rate) => {
     if (idx >= words.length) {
       if (pronLoopRef.current) { setTimeout(() => playWordAt(0, words, rate), 700); }
@@ -546,7 +583,7 @@ function AlsacienApp() {
       setTimeout(() => playWordAt(idx + 1, words, pronRateRef.current), 900);
     });
   }, [speakWord]);
-
+ 
   const startPronAll = () => {
     pronLoopRef.current = pronLoop; pronRateRef.current = pronRate;
     setPronPlaying(true); playWordAt(0, pronWords, pronRate);
@@ -557,7 +594,7 @@ function AlsacienApp() {
   };
   useEffect(() => { pronLoopRef.current = pronLoop; }, [pronLoop]);
   useEffect(() => { pronRateRef.current = pronRate; }, [pronRate]);
-
+ 
   const translate = async (txt) => {
     const cleaned = applyAntiGerm(txt || input);
     if (!cleaned.trim()) return;
@@ -567,12 +604,14 @@ function AlsacienApp() {
       ? "Traduis ce texte FRANÇAIS en dialecte alsacien authentique (Elsässisch, graphie ORTHAL)."
       : "Traduis ce texte ALSACIEN en français courant.";
     try {
+      const _schema = '{"direction":"' + dirLabel + '","translation":"...","phonetic":"...","bas_rhin":null,"haut_rhin":null,"notes":"...","literal":null,"register":"..."}';
+      const _prompt = "Tu es un expert linguiste specialise dans le dialecte alsacien. DIRECTION : " + dirForce + " Reponds UNIQUEMENT en JSON valide sans backticks : " + _schema + " Texte : " + cleaned;
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method:"POST",
-        headers:{"Content-Type":"application/json"},
+        headers:{"Content-Type":"application/json","x-api-key":"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","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
         body: JSON.stringify({
           model:"claude-sonnet-4-20250514", max_tokens:1000,
-          messages:[{ role:"user", content:"Tu es un expert linguiste spécialisé dans le dialecte alsacien (Elsässisch). DIRECTION IMPOSÉE : "+dirForce+"\nRéponds UNIQUEMENT en JSON valide sans backticks :\n{\"direction\":\""+dirLabel+"\",\"translation\":\"...\",\"phonetic\":\"...\",\"bas_rhin\":null,\"haut_rhin\":null,\"notes\":\"...\",\"literal\":null,\"register\":\"...\"}\nTexte : \""+cleaned+"\"" }]
+          messages:[{ role:"user", content: _prompt }]
         })
       });
       const data = await res.json();
@@ -586,25 +625,45 @@ function AlsacienApp() {
     }
     setLoading(false);
   };
-
+ 
   const toggleVoice = () => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { alert("Utilise Chrome ou Safari !"); return; }
+    if (!SR) { alert("La dictée nécessite Safari sur iOS/macOS ou Chrome."); return; }
     if (listening) { recRef.current?.stop(); setListening(false); return; }
-    const r = new SR(); r.lang="fr-FR"; r.continuous=false; r.interimResults=true;
-    r.onresult = e => { const t=Array.from(e.results).map(x=>x[0].transcript).join(""); setTranscript(t); if(e.results[0].isFinal){setInput(t);setTranscript("");} };
-    r.onend = () => setListening(false);
-    r.start(); recRef.current=r; setListening(true); setTranscript("");
+    try {
+      const r = new SR();
+      r.lang = direction === "als2fr" ? "de-DE" : "fr-FR";
+      r.continuous = false;
+      r.interimResults = true;
+      r.onerror = (e) => {
+        setListening(false);
+        if (e.error === "not-allowed") alert("Autorise le micro dans Réglages > Safari > Microphone.");
+        else if (e.error === "no-speech") setTranscript("");
+      };
+      r.onresult = e => {
+        const t = Array.from(e.results).map(x=>x[0].transcript).join("");
+        setTranscript(t);
+        if (e.results[0].isFinal) { setInput(t); setTranscript(""); }
+      };
+      r.onend = () => setListening(false);
+      r.start();
+      recRef.current = r;
+      setListening(true);
+      setTranscript("");
+    } catch(err) {
+      alert("Erreur microphone : " + err.message);
+      setListening(false);
+    }
   };
-
+ 
   const copyToClipboard = () => {
     if (!result) return;
-    navigator.clipboard.writeText(input+"\n→ "+result.translation+"\n📢 /"+result.phonetic+"/\n\nVia Elsassich");
+    navigator.clipboard.writeText(input + " → " + result.translation + " / " + result.phonetic + " / Via Elsassich");
     setCopyOk(true); setTimeout(() => { setCopyOk(false); setShowShare(false); }, 1500);
   };
-  const shareWhatsApp = () => { if (!result) return; window.open("https://wa.me/?text="+encodeURIComponent("\""+input+"\" → "+result.translation+" — Elsassich"), "_blank"); setShowShare(false); };
-  const shareNative = () => { if (navigator.share && result) navigator.share({ title:"Elsassich", text:"\""+input+"\" → "+result.translation }).catch(()=>{}); setShowShare(false); };
-
+  const shareWhatsApp = () => { if (!result) return; window.open("https://wa.me/?text="+encodeURIComponent(input+" → "+result.translation+" — Elsassich"), "_blank"); setShowShare(false); };
+  const shareNative = () => { if (navigator.share && result) navigator.share({ title:"Elsassich", text:input+" → "+result.translation }).catch(()=>{}); setShowShare(false); };
+ 
   const swipeStartX = useRef(null);
   const handleSwipeStart = (e) => { swipeStartX.current = e.touches?.[0]?.clientX ?? e.clientX; };
   const handleSwipeEnd = (e) => {
@@ -614,7 +673,7 @@ function AlsacienApp() {
     if (endX - swipeStartX.current > 50) { setInput(""); setResult(null); }
     swipeStartX.current = null;
   };
-
+ 
   const pickAnswer = (idx) => {
     if (quizPick !== null) return;
     setQuizPick(idx); setQuizTotal(t=>t+1);
@@ -625,7 +684,7 @@ function AlsacienApp() {
     }, 1100);
   };
   const resetQuiz = () => { setQuizIdx(0); setQuizPick(null); setQuizScore(0); setQuizTotal(0); setQuizDone(false); };
-
+ 
   const LESSON_CATS = [
     { id:"salutations", label:"Salutations", emoji:"👋", desc:"Bonjour, merci, au revoir…" },
     { id:"cuisine", label:"Cuisine & Bière", emoji:"🍽️", desc:"Knack, Baeckeoffe, Bier…" },
@@ -658,7 +717,7 @@ function AlsacienApp() {
     const q = search.toLowerCase();
     return mc && (!q || e.als.toLowerCase().includes(q) || e.fr.toLowerCase().includes(q));
   });
-
+ 
   const css = \`
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=Outfit:wght@300;400;500;600;700&display=swap');
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -912,12 +971,12 @@ function AlsacienApp() {
     .cdv-note{margin-top:9px;font-size:12px;color:\${T.sub};line-height:1.5;background:\${T.accentLight};border-radius:8px;padding:9px 12px}
     .cdv-toggle{color:\${T.muted};font-size:12px;margin-left:auto;transition:transform .2s;flex-shrink:0;margin-top:4px}
   \`;
-
+ 
   const finishOnboarding = () => {
     try { Storage.setItem('els_onboarded','1'); } catch {}
     setShowOnboarding(false);
   };
-
+ 
   if (showOnboarding) return (
     <>
       <style>{css}</style>
@@ -964,12 +1023,12 @@ function AlsacienApp() {
       </div>
     </>
   );
-
+ 
   return (
     <>
       <style>{css}</style>
       <div className="app">
-
+ 
         <div className="hdr">
           <div className="hdr-inner">
             <div className="hdr-badge">🥨</div>
@@ -981,7 +1040,7 @@ function AlsacienApp() {
           </div>
           <div className="hdr-rule"/>
         </div>
-
+ 
         <div className="streak-bar">
           <div className="streak-item">
             <span className="streak-fire">🔥</span>
@@ -1001,7 +1060,7 @@ function AlsacienApp() {
             <span className="level-label">{getLevel(xp).label}</span>
           </div>
         </div>
-
+ 
         <div className="wod">
           <div className="wod-pill">MOT<br/>DU JOUR</div>
           <div style={{flex:1}}>
@@ -1010,7 +1069,9 @@ function AlsacienApp() {
           </div>
           <button className="wod-play" onClick={() => speak(wordOfDay.als, "wod")}>{speaking==="wod"?"🔊":"▶️"}</button>
         </div>
-
+ 
+        <AdBanner />
+ 
         <div className="tabs">
           {[
             {id:"translate",icon:"🔤",label:"Traduire"},
@@ -1026,9 +1087,9 @@ function AlsacienApp() {
             </button>
           ))}
         </div>
-
+ 
         <div className="content">
-
+ 
           {tab==="translate" && <>
             {correctionMsg && <div className="corr-toast">{correctionMsg}</div>}
             <div className="dir-toggle">
@@ -1041,9 +1102,10 @@ function AlsacienApp() {
               </button>
             </div>
             <div className="exemples">
-              {EXEMPLES.map((ex,i) => (
+              {exemples.map((ex,i) => (
                 <button key={i} className="ex-chip" onClick={() => { setInput(ex); translate(ex); }}>{ex}</button>
               ))}
+              <button className="ex-chip" style={{opacity:0.6,minWidth:32}} onClick={() => setExemples([...EXEMPLES_ALL].sort(()=>Math.random()-0.5).slice(0,6))} title="Nouvelles suggestions">🔀</button>
             </div>
             <div className="tbox">
               <div className="tlabel">{direction==="fr2als" ? "🇫🇷 Texte en français" : "🥨 Texte en alsacien"}</div>
@@ -1102,7 +1164,7 @@ function AlsacienApp() {
               ))}
             </>}
           </>}
-
+ 
           {tab==="prononcer" && <>
             <div className="sec-title">Prononcer 🔊</div>
             <div className="sec-sub">Écoute et répète — mot par mot, à ton rythme</div>
@@ -1155,7 +1217,7 @@ function AlsacienApp() {
               ))}
             </div>
           </>}
-
+ 
           {tab==="expressions" && <>
             <div className="sec-title">Expressions idiomatiques</div>
             <div className="sec-sub">Les vraies perles du dialecte — tape pour dévoiler</div>
@@ -1167,6 +1229,7 @@ function AlsacienApp() {
                     <div className="ecard-als">« {e.als} »</div>
                     <div className="ecard-fr">{e.fr}</div>
                   </div>
+                  <button onClick={ev=>{ev.stopPropagation();setCorrectWord(e.als);setCorrectSugg("");setCorrectSent(false);setShowCorrect(true);}} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,padding:"4px 6px",opacity:0.6,flexShrink:0}} title="Proposer une correction">✏️</button>
                   <div className="ecard-toggle" style={{transform:flipped===i?"rotate(180deg)":"none"}}>▼</div>
                 </div>
                 {flipped===i && (
@@ -1180,7 +1243,7 @@ function AlsacienApp() {
               </div>
             ))}
           </>}
-
+ 
           {tab==="quiz" && <>
             <div className="sec-title">Quiz Elsässisch 🎯</div>
             <div className="sec-sub">{shuffled.length} questions — teste ton niveau !</div>
@@ -1220,7 +1283,7 @@ function AlsacienApp() {
               </div>
             )}
           </>}
-
+ 
           {tab==="lesson" && <>
             {!lessonCat ? <>
               <div className="sec-title">Leçons 📚</div>
@@ -1309,7 +1372,7 @@ function AlsacienApp() {
               </>}
             </>}
           </>}
-
+ 
           {tab==="cdv" && <>
             <div className="sec-title">Comment dites-vous ? 🗣️</div>
             <div className="sec-sub">Les vraies phrases du quotidien — alsacien authentique</div>
@@ -1339,7 +1402,7 @@ function AlsacienApp() {
               </div>
             ))}
           </>}
-
+ 
           {tab==="ads" && <>
             <div className="sec-title">Partenaires locaux</div>
             <div className="sec-sub">Soutiens les commerces qui font vivre l'Alsace</div>
@@ -1362,9 +1425,9 @@ function AlsacienApp() {
             </div>
             <div style={{textAlign:"center",fontSize:11,color:T.muted,marginTop:13}}>Partenaires locaux sélectionnés · Sans régie publicitaire externe</div>
           </>}
-
+ 
         </div>
-
+ 
         {showLevelUp && (
           <div className="levelup-toast">
             <div className="levelup-ico">{showLevelUp.icon}</div>
@@ -1374,7 +1437,7 @@ function AlsacienApp() {
             </div>
           </div>
         )}
-
+ 
         {showProfile && (
           <div className="correct-modal" onClick={e=>{if(e.target===e.currentTarget)setShowProfile(false);}}>
             <div className="profile-sheet">
@@ -1418,11 +1481,11 @@ function AlsacienApp() {
             </div>
           </div>
         )}
-
+ 
         <button className="correct-fab" onClick={()=>{ setShowCorrect(true); setCorrectSent(false); setCorrectWord(""); setCorrectSugg(""); }} title="Proposer une correction">
           ✏️
         </button>
-
+ 
         {showCorrect && (
           <div className="correct-modal" onClick={e=>{ if(e.target===e.currentTarget) setShowCorrect(false); }}>
             <div className="correct-sheet">
@@ -1460,7 +1523,7 @@ function AlsacienApp() {
             </div>
           </div>
         )}
-
+ 
         {(()=>{
           const adIdx = Math.floor(Date.now()/30000) % LOCAL_ADS.length;
           const ad = LOCAL_ADS[adIdx];
@@ -1491,14 +1554,13 @@ function AlsacienApp() {
             </div>
           );
         })()}
-
+ 
       </div>
     </>
   );
 }
 `;
   </script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js" onload="initApp()"></script>
   <script>
     function initApp() {
       try {
@@ -1507,12 +1569,16 @@ function AlsacienApp() {
           filename: 'app.jsx'
         }).code;
         const execCode = transformed + '\nconst _root = ReactDOM.createRoot(document.getElementById("root")); _root.render(React.createElement(AlsacienApp));';
-        const fn = new Function(execCode);
-        fn();
+        const script = document.createElement('script');
+        script.textContent = execCode;
+        document.body.appendChild(script);
+        // Show the start button once app is ready
         setTimeout(() => {
-          const s = document.getElementById('splash');
-          if (s) { s.classList.add('hide'); setTimeout(() => s.remove(), 700); }
-        }, 300);
+          const btn = document.querySelector('.sp-start-btn');
+          if (btn) btn.style.opacity = '1';
+          const dots = document.querySelector('.sp-dots');
+          if (dots) dots.style.display = 'none';
+        }, 200);
       } catch(e) {
         const s = document.getElementById('splash');
         if (s) s.remove();
@@ -1520,6 +1586,6 @@ function AlsacienApp() {
       }
     }
   </script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js" onload="initApp()"></script>
 </body>
-</html>
 </html>
