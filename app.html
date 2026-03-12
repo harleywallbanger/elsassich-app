@@ -617,7 +617,7 @@ function AlsacienApp() {
       const _prompt = "Tu es un expert linguiste specialise dans le dialecte alsacien (Elsassisch), graphie ORTHAL stricte. REGLES IMPORTANTES : ecris geht (jamais gaht), ich (jamais ìch), wie geht's (jamais wie gaht's). Utilise exclusivement les formes ORTHAL normalisees. DIRECTION : " + dirForce + " Reponds UNIQUEMENT en JSON valide sans backticks : " + _schema + " Texte : " + cleaned;
       const res = await fetch("https://api.anthropic.com/v1/messages", {
         method:"POST",
-        headers:{"Content-Type":"application/json","x-api-key":"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","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+        headers:{"Content-Type":"application/json","x-api-key":"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","anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
         body: JSON.stringify({
           model:"claude-sonnet-4-20250514", max_tokens:1000,
           messages:[{ role:"user", content: _prompt }]
