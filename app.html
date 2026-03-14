@@ -614,7 +614,7 @@ function AlsacienApp() {
       : "Traduis ce texte ALSACIEN en français courant.";
     try {
       const _schema = '{"direction":"' + dirLabel + '","translation":"...","phonetic":"...","bas_rhin":null,"haut_rhin":null,"notes":"...","literal":null,"register":"..."}';
-      const _prompt = "Tu es un expert linguiste specialise dans le dialecte alsacien (Elsassisch), graphie ORTHAL stricte. REGLES IMPORTANTES : ecris geht (jamais gaht/gohn), ich (jamais ìch), wie geht's (jamais wie gaht's), Kerich (jamais Kilch/Kirch), geh (jamais gohn), guet (jamais güet), nit (jamais nìt), isch (jamais ischt). Utilise exclusivement les formes ORTHAL normalisees. DIRECTION : " + dirForce + " Reponds UNIQUEMENT en JSON valide sans backticks : " + _schema + " Texte : " + cleaned;
+      const _prompt = "Tu es un expert linguiste specialise dans le dialecte alsacien (Elsassisch), graphie ORTHAL stricte. REGLES IMPORTANTES : ecris morje (jamais Morn/Morgen), ecris geht (jamais gaht/gohn), ich (jamais ìch), wie geht's (jamais wie gaht's), Kerich (jamais Kilch/Kirch), geh (jamais gohn/gang), guet (jamais güet), nit (jamais nìt), isch (jamais ischt). Utilise exclusivement les formes ORTHAL normalisees. DIRECTION : " + dirForce + " Reponds UNIQUEMENT en JSON valide sans backticks : " + _schema + " Texte : " + cleaned;
       const res = await fetch("https://elsassisch-proxy.vercel.app/api/translate", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
